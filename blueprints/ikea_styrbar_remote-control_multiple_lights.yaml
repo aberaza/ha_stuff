@@ -313,10 +313,13 @@ action:
               target_index: !input selected_target
               target_entity_id: "{{ expand(targets)[states(selected_target) | int] | attr('entity_id') }}"
               target_entity_domain: "{{ target_entity_id.split('.')[0] }}"
+              target_entity_status: "{% if target_entity_domain == 'light'%}{{ state_attr(target_entity_id, 'brightness' )}}{% else %}{% if states(target_entity_id) == 'on' %}1{% else %}0{% endif %}{% endif %}"
           - sequence:
               - service: "{{ target_entity_domain }}.turn_{% if states(target_entity_id) == 'off' %}on{% else %}off{% endif %}"
                 target:
                   entity_id: "{{ target_entity_id }}"
+                data:
+                  brightness_pct: 20
               - delay:
                   hours: 0
                   minutes: 0
@@ -363,6 +366,8 @@ action:
               - service: "{{ target_entity_domain }}.turn_{% if states(target_entity_id) == 'off' %}on{% else %}off{% endif %}"
                 target:
                   entity_id: "{{ target_entity_id }}"
+                data:
+                  brightness_pct: 20
               - delay:
                   hours: 0
                   minutes: 0
@@ -371,6 +376,8 @@ action:
               - service: "{{ target_entity_domain }}.turn_{% if states(target_entity_id) == 'off' %}on{% else %}off{% endif %}"
                 target:
                   entity_id: "{{ target_entity_id }}"
+                data:
+                  brightness: "{{ target_entity_status }}"
         alias: arrow_right_click
       - conditions:
           - condition: template
